@@ -6,8 +6,8 @@ import 'package:cinemapedia/infrastructure/models/moviedb/models_moviedb.dart';
 class MovieMapper {
 
   static Movie movieDBToEntity(MovieFromMovieDB movieDB){
-    final String imageURL = 'https://image.tmdb.org/t/p/original';
-    final String imageNotFound = 'https://cdn.displate.com/artwork/857x1200/2022-04-15/7422bfe15b3ea7b5933dffd896e9c7f9_46003a1b7353dc7b5a02949bd074432a.jpg';
+    final String imageURL = 'https://image.tmdb.org/t/p/w500';
+    final String imageNotFound = 'https://cdn.displate.com/original/857x1200/2022-04-15/7422bfe15b3ea7b5933dffd896e9c7f9_46003a1b7353dc7b5a02949bd074432a.jpg';
 
     return Movie(
       adult: movieDB.adult,
