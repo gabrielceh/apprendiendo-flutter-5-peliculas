@@ -3,3 +3,4 @@ export 'movies/movies_horizontal_listview.dart';
 
 export 'shared/custom_appbar.dart';
 export 'shared/custom_bottom_navbar.dart';
+export 'shared/full_screen_loaders.dart';

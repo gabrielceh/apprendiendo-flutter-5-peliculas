@@ -46,127 +46,83 @@ class _HomeViewState extends ConsumerState<_HomeView> {
 
   @override
   Widget build(BuildContext context) {
-    final nowPlayingMovies = ref.watch(nowPlayingMoviesProvider);
+    final initialLoading = ref.watch(initialLoadingProvider);
+
     final moviesSlideshow = ref.watch(moviesSlideshowProvider);
+    final nowPlayingMovies = ref.watch(nowPlayingMoviesProvider);
     final popularMovies = ref.watch(popularMoviesProvider);
     final upcomingMovies = ref.watch(upcomingMoviesPRovider);
     final topRatedMovies = ref.watch(topRatedMoviesProvider);
 
-    if (moviesSlideshow.isEmpty) {
-      return CircularProgressIndicator();
-    }
 
-    return CustomScrollView(
-      slivers: [
-
-        const SliverAppBar(
-          floating: true,
-          flexibleSpace: FlexibleSpaceBar(
-            title: CustomAppBar(),
-            titlePadding: EdgeInsets.only(left: 0),
-          ),
-          
-        ),
-
-        SliverList(
-          delegate: SliverChildBuilderDelegate(
-            childCount: 4,
-            (context, index){
-              return Column(
-                children: [
-              
-                  MoviesSlideshow(movies: moviesSlideshow),
-              
-                  MoviesHorizontalListview(
-                    movies: nowPlayingMovies,
-                    title: 'En cines',
-                    subtitle: 'Hoy',
-                    loadNextPage: (){
-                      ref.read(nowPlayingMoviesProvider.notifier).loadNextPage();
-                    },
-                  ),
-                
-                  MoviesHorizontalListview(
-                    movies: popularMovies,
-                    title: 'Populares',
-                    loadNextPage: (){
-                      ref.read(popularMoviesProvider.notifier).loadNextPage();
-                    },
-                  ),
-                  
-                  MoviesHorizontalListview(
-                    movies: upcomingMovies,
-                    title: 'Próximos estrenos',
-                    subtitle: 'Pronto',
-                    loadNextPage: (){
-                      ref.read(upcomingMoviesPRovider.notifier).loadNextPage();
-                    },
-                  ),
-                  
-                  MoviesHorizontalListview(
-                    movies: topRatedMovies,
-                    title: 'Mejor calificados',
-                    subtitle: 'De todos los tiempos',
-                    loadNextPage: (){
-                      ref.read(topRatedMoviesProvider.notifier).loadNextPage();
-                    },
-                  ),
-
-                  SizedBox(height: 20),
-                ]
-              );
-            },
+    return Visibility(
+      visible: !initialLoading,
+      replacement: const FullScreenLoader(),
+      child: CustomScrollView(
+        slivers: [
+          const SliverAppBar(
+            floating: true,
+            flexibleSpace: FlexibleSpaceBar(
+              title: CustomAppBar(),
+              titlePadding: EdgeInsets.only(left: 0),
+            ),
             
+          ),
+      
+          SliverList(
+            delegate: SliverChildBuilderDelegate(
+              childCount: 1,
+              (context, index){
+                return Column(
+                  children: [
+                    MoviesSlideshow(movies: moviesSlideshow),
+                
+                    MoviesHorizontalListview(
+                      movies: nowPlayingMovies,
+                      title: 'En cines',
+                      subtitle: 'Hoy',
+                      loadNextPage: (){
+                        ref.read(nowPlayingMoviesProvider.notifier).loadNextPage();
+                      },
+                    ),
+                  
+                    MoviesHorizontalListview(
+                      movies: popularMovies,
+                      title: 'Populares',
+                      loadNextPage: (){
+                        ref.read(popularMoviesProvider.notifier).loadNextPage();
+                      },
+                    ),
+                    
+                    MoviesHorizontalListview(
+                      movies: upcomingMovies,
+                      title: 'Próximos estrenos',
+                      subtitle: 'Pronto',
+                      loadNextPage: (){
+                        ref.read(upcomingMoviesPRovider.notifier).loadNextPage();
+                      },
+                    ),
+                    
+                    MoviesHorizontalListview(
+                      movies: topRatedMovies,
+                      title: 'Mejor calificados',
+                      subtitle: 'De todos los tiempos',
+                      loadNextPage: (){
+                        ref.read(topRatedMoviesProvider.notifier).loadNextPage();
+                      },
+                    ),
+      
+                    SizedBox(height: 20),
+                  ]
+                );
+              }
+            )
           )
-        )
-      ]
+        ]
+      ),
     );
   }
 }
 
-/**
- Column(
-        children: [
-          CustomAppBar(),
-      
-          MoviesSlideshow(movies: moviesSlideshow),
-      
-          MoviesHorizontalListview(
-            movies: nowPlayingMovies,
-            title: 'En cines',
-            subtitle: 'Hoy',
-            loadNextPage: (){
-              ref.read(nowPlayingMoviesProvider.notifier).loadNextPage();
-            },
-          ),
-         
-          MoviesHorizontalListview(
-            movies: nowPlayingMovies,
-            title: 'Proximos estrenos',
-            subtitle: 'Pronto',
-            loadNextPage: (){
-              ref.read(nowPlayingMoviesProvider.notifier).loadNextPage();
-            },
-          ),
-          
-          MoviesHorizontalListview(
-            movies: nowPlayingMovies,
-            title: 'Populares',
-            loadNextPage: (){
-              ref.read(nowPlayingMoviesProvider.notifier).loadNextPage();
-            },
-          ),
-          
-          MoviesHorizontalListview(
-            movies: nowPlayingMovies,
-            title: 'Mejor calificados',
-            subtitle: 'De todos los tiempos',
-            loadNextPage: (){
-              ref.read(nowPlayingMoviesProvider.notifier).loadNextPage();
-            },
-          ),
 
-          SizedBox(height: 20),
-        ]
-      ),
- */
+ 
