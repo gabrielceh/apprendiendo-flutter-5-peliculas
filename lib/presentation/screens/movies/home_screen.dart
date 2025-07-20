@@ -37,13 +37,20 @@ class _HomeViewState extends ConsumerState<_HomeView> {
   @override
   void initState() {
     super.initState();
+    // cuando se inicia la app, cargamos los povider para que hagan las peticiones
     ref.read(nowPlayingMoviesProvider.notifier).loadNextPage();
+    ref.read(popularMoviesProvider.notifier).loadNextPage();
+    ref.read(upcomingMoviesPRovider.notifier).loadNextPage();
+    ref.read(topRatedMoviesProvider.notifier).loadNextPage();
   }
 
   @override
   Widget build(BuildContext context) {
     final nowPlayingMovies = ref.watch(nowPlayingMoviesProvider);
     final moviesSlideshow = ref.watch(moviesSlideshowProvider);
+    final popularMovies = ref.watch(popularMoviesProvider);
+    final upcomingMovies = ref.watch(upcomingMoviesPRovider);
+    final topRatedMovies = ref.watch(topRatedMoviesProvider);
 
     if (moviesSlideshow.isEmpty) {
       return CircularProgressIndicator();
@@ -63,6 +70,7 @@ class _HomeViewState extends ConsumerState<_HomeView> {
 
         SliverList(
           delegate: SliverChildBuilderDelegate(
+            childCount: 4,
             (context, index){
               return Column(
                 children: [
@@ -79,28 +87,28 @@ class _HomeViewState extends ConsumerState<_HomeView> {
                   ),
                 
                   MoviesHorizontalListview(
-                    movies: nowPlayingMovies,
-                    title: 'Proximos estrenos',
-                    subtitle: 'Pronto',
-                    loadNextPage: (){
-                      ref.read(nowPlayingMoviesProvider.notifier).loadNextPage();
-                    },
-                  ),
-                  
-                  MoviesHorizontalListview(
-                    movies: nowPlayingMovies,
+                    movies: popularMovies,
                     title: 'Populares',
                     loadNextPage: (){
-                      ref.read(nowPlayingMoviesProvider.notifier).loadNextPage();
+                      ref.read(popularMoviesProvider.notifier).loadNextPage();
                     },
                   ),
                   
                   MoviesHorizontalListview(
-                    movies: nowPlayingMovies,
+                    movies: upcomingMovies,
+                    title: 'Próximos estrenos',
+                    subtitle: 'Pronto',
+                    loadNextPage: (){
+                      ref.read(upcomingMoviesPRovider.notifier).loadNextPage();
+                    },
+                  ),
+                  
+                  MoviesHorizontalListview(
+                    movies: topRatedMovies,
                     title: 'Mejor calificados',
                     subtitle: 'De todos los tiempos',
                     loadNextPage: (){
-                      ref.read(nowPlayingMoviesProvider.notifier).loadNextPage();
+                      ref.read(topRatedMoviesProvider.notifier).loadNextPage();
                     },
                   ),
 
@@ -108,7 +116,7 @@ class _HomeViewState extends ConsumerState<_HomeView> {
                 ]
               );
             },
-            childCount: 10
+            
           )
         )
       ]

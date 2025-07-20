@@ -6,9 +6,31 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 final nowPlayingMoviesProvider = StateNotifierProvider<MoviesNotifier, List<Movie>>((ref) {
   // llamamos al repository provider para obtener mas movies, el metodo getNowPlaying es el que esta en el MovieRepositoryImpl
   final fetchMoreMovies = ref.watch(movieRepositoryProvider).getNowPlaying;
-  
   return MoviesNotifier(
     fetchMoreMovies: fetchMoreMovies,
+  );
+});
+
+
+
+final popularMoviesProvider = StateNotifierProvider<MoviesNotifier, List<Movie>>((ref) {
+  final fetchMoreMovies = ref.watch(movieRepositoryProvider).getPopular;
+  return MoviesNotifier(
+    fetchMoreMovies: fetchMoreMovies,
+  );
+});
+
+final upcomingMoviesPRovider = StateNotifierProvider<MoviesNotifier, List<Movie>>((ref){
+  final fetchMovies = ref.watch(movieRepositoryProvider).getUpcoming;
+  return MoviesNotifier(
+    fetchMoreMovies: fetchMovies,
+  );
+});
+
+final topRatedMoviesProvider = StateNotifierProvider<MoviesNotifier, List<Movie>>((ref){
+  final fetchMovies = ref.watch(movieRepositoryProvider).getTopRated;
+  return MoviesNotifier(
+    fetchMoreMovies: fetchMovies,
   );
 });
 
