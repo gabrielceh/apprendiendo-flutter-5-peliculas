@@ -2,6 +2,7 @@ import 'package:animate_do/animate_do.dart';
 import 'package:cinemapedia/config/helpers/human_formats.dart';
 import 'package:cinemapedia/domain/entities/movie.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class MoviesHorizontalListview extends StatefulWidget {
 
@@ -123,25 +124,7 @@ class _Slide extends StatelessWidget {
             width: 150,
             child:ClipRRect(
               borderRadius: BorderRadius.circular(20),
-              child: Image.network(
-                movie.posterPath,
-                fit: BoxFit.cover,
-                height: 225,
-                width: 150,
-                loadingBuilder: (context, child, loadingProgress){
-                  if (loadingProgress != null){
-                    return SizedBox(
-                      height: 225,
-                      child: Center(
-                        child: const CircularProgressIndicator(
-                          strokeWidth: 2,
-                        ),
-                      ),
-                    );
-                  }
-                  return FadeIn(child: child);
-                },
-              ),
+              child: _ImageCardMovie(movie: movie),
             ),
           ),
           
@@ -160,6 +143,43 @@ class _Slide extends StatelessWidget {
 
         ],
       ),
+    );
+  }
+}
+
+class _ImageCardMovie extends StatelessWidget {
+  const _ImageCardMovie({
+    required this.movie,
+  });
+
+  final Movie movie;
+
+  @override
+  Widget build(BuildContext context) {
+    return Image.network(
+      movie.posterPath,
+      fit: BoxFit.cover,
+      height: 225,
+      width: 150,
+      loadingBuilder: (context, child, loadingProgress){
+        if (loadingProgress != null){
+          return SizedBox(
+            height: 225,
+            child: Center(
+              child: const CircularProgressIndicator(
+                strokeWidth: 2,
+              ),
+            ),
+          );
+        }
+          return GestureDetector(
+            onTap: (){
+              context.push('/movie/${movie.id}');
+            },
+            child: FadeIn(child: child),
+          );
+
+      },
     );
   }
 }

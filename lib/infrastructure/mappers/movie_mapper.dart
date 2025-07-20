@@ -12,6 +12,7 @@ class MovieMapper {
     return Movie(
       adult: movieDB.adult,
       backdropPath: movieDB.backdropPath != "" ? '$imageURL${movieDB.backdropPath}' : imageNotFound,
+      budget: "",
       genreIds: movieDB.genreIds.map((e) => e.toString()).toList(),
       id: movieDB.id,
       originalLanguage: movieDB.originalLanguage,
@@ -19,6 +20,29 @@ class MovieMapper {
       overview: movieDB.overview,
       popularity: movieDB.popularity,
       posterPath: movieDB.posterPath != "" ? '$imageURL${movieDB.posterPath}' : 'no-poster',
+      releaseDate: movieDB.releaseDate,
+      title: movieDB.title,
+      video: movieDB.video,
+      voteAverage: movieDB.voteAverage,
+      voteCount: movieDB.voteCount,
+    );
+  }
+
+  static Movie movieDetailsToEntity(MovieDetails movieDB){
+    final String imageURL = 'https://image.tmdb.org/t/p/w500';
+    final String imageNotFound = 'https://cdn.displate.com/original/857x1200/2022-04-15/7422bfe15b3ea7b5933dffd896e9c7f9_46003a1b7353dc7b5a02949bd074432a.jpg';
+
+    return Movie(
+      adult: movieDB.adult,
+      backdropPath: movieDB.backdropPath != "" ? '$imageURL${movieDB.backdropPath}' : imageNotFound,
+      budget: movieDB.budget.toString(),
+      genreIds: movieDB.genres.map((e) => e.name.toString()).toList(),
+      id: movieDB.id,
+      originalLanguage: movieDB.originalLanguage,
+      originalTitle: movieDB.originalTitle,
+      overview: movieDB.overview,
+      popularity: movieDB.popularity,
+      posterPath: movieDB.posterPath != "" ? '$imageURL${movieDB.posterPath}' : imageNotFound,
       releaseDate: movieDB.releaseDate,
       title: movieDB.title,
       video: movieDB.video,
