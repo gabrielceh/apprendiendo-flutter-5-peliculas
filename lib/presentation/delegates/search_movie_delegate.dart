@@ -19,7 +19,7 @@ class SearchMovieDelegate extends SearchDelegate<Movie?>{
   SearchMovieDelegate({
     required this.searchMovies,  
     required this.initialMovies
-  });
+  }):super();
 
   // cerramos los streams cuando salimos de la vista
   void clearStreams(){
@@ -32,10 +32,11 @@ class SearchMovieDelegate extends SearchDelegate<Movie?>{
 
     _debounceTimer = Timer(const Duration(milliseconds: 500), () async {
       // buscando las películas
-      if(query.isEmpty) {
-        debounceMovie.add([]);
-        return;
-      }
+      // if(query.isEmpty) {
+      //   debounceMovie.add([]);
+      //   return;
+      // }
+      if(debounceMovie.isClosed) return; // si el stream ya se cerro, no hacemos nada
       final movies = await searchMovies(query);
       debounceMovie.add(movies);
       initialMovies = movies;
@@ -43,6 +44,29 @@ class SearchMovieDelegate extends SearchDelegate<Movie?>{
     });
   }
 
+  Widget _buildResultsAndSuggestions() {
+    return StreamBuilder(
+      stream: debounceMovie.stream,
+      initialData: initialMovies,
+      builder: (context, snapshot) {
+        final movies = snapshot.data ?? [];
+
+        return ListView.builder(
+          itemCount: movies.length,
+          itemBuilder: (context, index) {
+            final movie = movies[index];
+
+            return _MovieSearchItem(
+              movie:  movie, 
+              onMovieSelected: (context,movie){
+                clearStreams();
+                close(context, movie);
+            },);
+          }
+        );
+      },
+    );
+  }
 
   // para contruir las acciones de la busqueda
   @override
@@ -97,29 +121,7 @@ class SearchMovieDelegate extends SearchDelegate<Movie?>{
   }
 
 
-  Widget _buildResultsAndSuggestions() {
-    return StreamBuilder(
-      stream: debounceMovie.stream,
-      initialData: initialMovies,
-      builder: (context, snapshot) {
-        final movies = snapshot.data ?? [];
 
-        return ListView.builder(
-          itemCount: movies.length,
-          itemBuilder: (context, index) {
-            final movie = movies[index];
-
-            return _MovieSearchItem(
-              movie:  movie, 
-              onMovieSelected: (context,movie){
-                close(context, movie);
-                clearStreams();
-            },);
-          }
-        );
-      },
-    );
-  }
   // para mostrar resultados de la busqueda cuando la persona presiona enter
   @override
   Widget buildResults(BuildContext context) {
