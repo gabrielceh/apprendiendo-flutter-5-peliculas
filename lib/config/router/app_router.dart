@@ -2,12 +2,16 @@ import 'package:cinemapedia/presentation/screens/screens.dart';
 import 'package:go_router/go_router.dart';
 
 final appRouter = GoRouter(
-  initialLocation: '/',
+  initialLocation: '/home/0',
   routes:[
     GoRoute(
-      path: '/',
+      path: '/home/:page',
       name: HomeScreen.routeName,
-      builder: (context, state) => const HomeScreen(),
+      builder: (context, state){
+        // hay que tenr cuidado de que el valor sea un int y que sea menor al tamaño del array que esta en el screen
+        final pageIndex = state.pathParameters['page'] ?? '0';
+        return HomeScreen(pageIndex: int.parse(pageIndex),);
+      },
       // rutas hijas o deep links
       routes: [
         GoRoute(
@@ -22,6 +26,8 @@ final appRouter = GoRouter(
 
       ]
     ),
+
+    GoRoute(path: '/', redirect: (_, _) => '/home/0'), // redireccionamos desde / a /home/0 (HomeView)
 
   ]
 );

@@ -1,7 +1,6 @@
 
 import 'package:cinemapedia/domain/entities/movie.dart';
 import 'package:cinemapedia/presentation/delegates/search_movie_delegate.dart';
-import 'package:cinemapedia/presentation/providers/movies/movies_repository_provider.dart';
 import 'package:cinemapedia/presentation/providers/search/search_movies_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -18,7 +17,6 @@ class CustomAppBar extends ConsumerWidget {
     final colors = Theme.of(context).colorScheme;
     final titleStyle = Theme.of(context).textTheme.titleMedium;
 
-    final moviesRepo = ref.read(movieRepositoryProvider);
 
     return SafeArea(
       // bottom: false,
@@ -54,7 +52,8 @@ class CustomAppBar extends ConsumerWidget {
                   ).then((movie){ // si queremos ir al detalle de una película
                     if(movie != null && context.mounted){
                       // si la persona selecciona una película, vamos a la película detallada
-                      context.push('/movie/${movie.id}');
+                      // context.push('/movie/${movie.id}');
+                      context.push('/home/0/movie/${movie.id}');
                     }
                   });
                  
