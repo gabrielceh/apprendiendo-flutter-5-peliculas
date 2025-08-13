@@ -30,3 +30,19 @@ subprojects {
     }
 }
 ```
+
+## PROD
+
+### Cambiar el nombre de la aplicación
+
+Instalamos el paquete [change_app_package_name](https://pub.dev/packages/change_app_package_name/install) para cambiar el nombre de la aplicación en modo desarrollo.
+
+```bash
+flutter pub add --dev change_app_package_name
+```
+
+Luego ejecutamos el comando:
+
+```bash
+flutter pub run change_app_package_name:main com.miempresaonombre.newname
+```
