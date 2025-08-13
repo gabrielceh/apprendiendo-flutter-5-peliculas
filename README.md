@@ -31,6 +31,8 @@ subprojects {
 }
 ```
 
+---
+
 ## PROD
 
 ### Cambiar el nombre de la aplicación
@@ -45,4 +47,30 @@ Luego ejecutamos el comando:
 
 ```bash
 flutter pub run change_app_package_name:main com.miempresaonombre.newname
+```
+
+---
+
+### Cambiar icono de la aplicación
+
+Instalamos el paquete [flutter_launcher_icons](https://pub.dev/packages/flutter_launcher_icons/install) para cambiar el icono de la aplicación en modo desarrollo.
+
+```bash
+flutter pub add --dev flutter_launcher_icons
+```
+
+Agregamos la configuración de flutter_launcher_icons en el archivo `pubspec.yaml`:
+
+```yaml
+flutter_launcher_icons:
+  android: 'launcher_icon'
+  ios: true
+  image_path: 'assets/icon/icon.png'
+  min_sdk_android: 21 # android min sdk min:16, default 21
+```
+
+Luego ejecutamos el comando:
+
+```bash
+flutter pub run flutter_launcher_icons
 ```
