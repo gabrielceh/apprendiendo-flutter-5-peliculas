@@ -74,3 +74,27 @@ Luego ejecutamos el comando:
 ```bash
 flutter pub run flutter_launcher_icons
 ```
+
+---
+
+### Cambiar splash screen
+
+Instalamos el paquete [flutter_native_splash](https://pub.dev/packages/flutter_native_splash/install) para cambiar el splash screen en modo desarrollo.
+
+```bash
+flutter pub add flutter_native_splash
+```
+
+Agregamos la configuración de flutter_native_splash en el archivo `pubspec.yaml`:
+
+```yaml
+flutter_native_splash:
+  color: '#252829'
+  image: 'assets/icon/icon.png'
+```
+
+Luego ejecutamos el comando:
+
+```bash
+flutter pub run flutter_native_splash:create
+```
