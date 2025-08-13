@@ -55,17 +55,48 @@ class MovieScreenState extends ConsumerState<MovieScreen> {
   }
 }
 
-class _CustomSliverAppBar extends StatelessWidget {
+// FuturtProvider permite trabajar con tareas asíncronas
+// family permite que el provider reciba un argumento, en este caso el movieId como int
+// Esto puede estar en su propio archio
+final  isFavoriteProvider = FutureProvider.family.autoDispose<bool, int>((ref, int movieId) async{
+  final localStorageRepository = ref.watch(localStorageRepositoryProvider);
+  return localStorageRepository.isMovieInFavorite(movieId);
+});
+
+class _CustomSliverAppBar extends ConsumerWidget {
   final Movie movie;
 
   const _CustomSliverAppBar({required this.movie});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+
+    final isFavFuture = ref.watch(isFavoriteProvider(movie.id)); // le pasamos el movieId como argumento
 
     final size = MediaQuery.of(context).size; // obtenemos la altura y anchura de la pantalla
 
     return SliverAppBar(
+      actions: [
+        IconButton(
+          onPressed: ()async{
+            // ref.read(localStorageRepositoryProvider)
+            // .toggleFavorite(movie)
+            // .then((_){
+            //   ref.invalidate(isFavoriteProvider(movie.id)); // invalidamos el provider para que se actualice
+            // });
+            await ref.read(favoriteMoviesProvider.notifier).toggleFavorite(movie);
+            ref.invalidate(isFavoriteProvider(movie.id)); // invalidamos el provider para que se actualice
+          },
+          icon: isFavFuture.when(
+            loading: () => const CircularProgressIndicator(),
+            data: (isFav) => isFav ? Icon(Icons.favorite, color: Colors.red): Icon(Icons.favorite_border)  ,
+            error: (_,_) => throw UnimplementedError() // no implementamos nada en caso de error por pereza
+          ),  
+          
+          // Icon(Icons.favorite_border),
+          // icon:  Icon(Icons.favorite, color: Colors.red),
+        )
+      ],
       backgroundColor: Colors.black,
       expandedHeight: size.height * 0.7, // ocupamos el 70% de la pantalla
       foregroundColor: Colors.white,
@@ -93,29 +124,17 @@ class _CustomSliverAppBar extends StatelessWidget {
 
             ),
 
-            const SizedBox.expand(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Colors.transparent, Colors.black87],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    stops: [0.65, 1.0], // dependiendo de la cantidad de colores, primer elemento para el primer color, etc
-                  )
-                ),
-              )
+            const _CustomGradient(
+              colors: [Colors.transparent, Colors.black87],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              stops: [0.65, 1.0],
             ),
-            const SizedBox.expand(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Colors.transparent, Colors.black87],
-                    begin: Alignment.bottomCenter,
-                    end: Alignment.topCenter,
-                    stops: [0.85, 1.0], // dependiendo de la cantidad de colores, primer elemento para el primer color, etc
-                  )
-                ),
-              )
+            const _CustomGradient(
+              colors: [Colors.transparent, Colors.black87],
+              begin: Alignment.bottomCenter,
+              end: Alignment.topCenter,
+              stops: [0.80, 1.0], // dependiendo de la cantidad de colores, primer elemento para el primer color, etc   
             )
             
           ] 
@@ -124,7 +143,6 @@ class _CustomSliverAppBar extends StatelessWidget {
     );
   }
 }
-
 
 class _MovieDetails extends StatelessWidget {
   final Movie movie;
@@ -259,6 +277,36 @@ class _ActorsByMovie extends ConsumerWidget {
         },
 
       ),
+    );
+  }
+}
+
+class _CustomGradient extends StatelessWidget {
+  final AlignmentGeometry begin;
+  final AlignmentGeometry end;
+  final List<double> stops;
+  final List<Color> colors;
+
+  const _CustomGradient({
+    required this.begin, 
+    required this.end, 
+    required this.stops, 
+    required this.colors
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox.expand(
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: colors,
+            begin: begin,
+            end:end,
+            stops: stops, // dependiendo de la cantidad de colores, primer elemento para el primer color, etc
+          )
+        ),
+      )
     );
   }
 }

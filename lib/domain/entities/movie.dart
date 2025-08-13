@@ -1,4 +1,14 @@
+import 'package:isar/isar.dart';
+
+// esto genera un archivo de código para el modelo
+part 'movie.g.dart';
+
+
+@collection // esto viene de isar
 class Movie {
+  // Id isarId = Isar.autoIncrement; // identificador de la base de datos auto incremental
+  Id? isarId;
+
   final bool adult;
   final String backdropPath;
   final String budget;
