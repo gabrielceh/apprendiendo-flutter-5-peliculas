@@ -98,3 +98,13 @@ Luego ejecutamos el comando:
 ```bash
 flutter pub run flutter_native_splash:create
 ```
+
+---
+
+## Android bundle
+
+[construir app bundle](https://docs.flutter.dev/deployment/android#building-an-app-bundle)
+
+```bash
+flutter build appbundle
+```
