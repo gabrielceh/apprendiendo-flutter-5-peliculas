@@ -1,4 +1,5 @@
 import 'package:animate_do/animate_do.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cinemapedia/config/helpers/human_formats.dart';
 import 'package:cinemapedia/domain/entities/movie.dart';
 import 'package:flutter/material.dart';
@@ -156,31 +157,34 @@ class _ImageCardMovie extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Image.network(
-      movie.posterPath,
-      fit: BoxFit.cover,
-      height: 225,
-      width: 150,
-      loadingBuilder: (context, child, loadingProgress){
-        if (loadingProgress != null){
-          return SizedBox(
-            height: 225,
-            child: Center(
-              child: const CircularProgressIndicator(
-                strokeWidth: 2,
-              ),
+    return GestureDetector(
+      onTap: () => context.push('/home/0/movie/${movie.id}'),
+      child: CachedNetworkImage(
+        imageUrl: movie.posterPath,
+        fit: BoxFit.cover,
+        height: 225,
+        width: 150,
+        placeholder: (context, url) => Container(
+          height: 225,
+          width: 150,
+          color: Colors.grey[300],
+          child: const Center(
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
             ),
-          );
-        }
-          return GestureDetector(
-            onTap: (){
-              // context.push('/movie/${movie.id}');
-              context.push('/home/0/movie/${movie.id}');
-            },
-            child: FadeIn(child: child),
-          );
-
-      },
+          ),
+        ),
+        errorWidget: (context, url, error) => Container(
+          height: 225,
+          width: 150,
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage('assets/images/image-not-found.png'), // Tu imagen de error
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
