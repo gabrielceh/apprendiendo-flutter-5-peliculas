@@ -1,4 +1,5 @@
 import 'package:animate_do/animate_do.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -7,22 +8,17 @@ import 'package:cinemapedia/presentation/providers/providers.dart';
 import 'package:cinemapedia/presentation/widgets/widgets.dart';
 
 class MovieScreen extends ConsumerStatefulWidget {
-
   static const String routeName = 'movie-screen';
 
   final String movieId;
-  
-  const MovieScreen({
-    super.key,
-    required this.movieId,
-  });
+
+  const MovieScreen({super.key, required this.movieId});
 
   @override
   MovieScreenState createState() => MovieScreenState();
 }
 
 class MovieScreenState extends ConsumerState<MovieScreen> {
-
   @override
   void initState() {
     super.initState();
@@ -33,10 +29,9 @@ class MovieScreenState extends ConsumerState<MovieScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     final Movie? movie = ref.watch(movieInfoProvider)[widget.movieId];
 
-    if(movie == null) return Scaffold(body: const FullScreenLoader());
+    if (movie == null) return Scaffold(body: const FullScreenLoader());
 
     return Scaffold(
       body: CustomScrollView(
@@ -48,8 +43,8 @@ class MovieScreenState extends ConsumerState<MovieScreen> {
               childCount: 1,
               (context, index) => _MovieDetails(movie: movie),
             ),
-          )
-        ]
+          ),
+        ],
       ),
     );
   }
@@ -58,7 +53,10 @@ class MovieScreenState extends ConsumerState<MovieScreen> {
 // FuturtProvider permite trabajar con tareas asíncronas
 // family permite que el provider reciba un argumento, en este caso el movieId como int
 // Esto puede estar en su propio archio
-final  isFavoriteProvider = FutureProvider.family.autoDispose<bool, int>((ref, int movieId) async{
+final isFavoriteProvider = FutureProvider.family.autoDispose<bool, int>((
+  ref,
+  int movieId,
+) async {
   final localStorageRepository = ref.watch(localStorageRepositoryProvider);
   return localStorageRepository.isMovieInFavorite(movieId);
 });
@@ -70,32 +68,42 @@ class _CustomSliverAppBar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isFavFuture = ref.watch(
+      isFavoriteProvider(movie.id),
+    ); // le pasamos el movieId como argumento
 
-    final isFavFuture = ref.watch(isFavoriteProvider(movie.id)); // le pasamos el movieId como argumento
-
-    final size = MediaQuery.of(context).size; // obtenemos la altura y anchura de la pantalla
+    final size = MediaQuery.of(
+      context,
+    ).size; // obtenemos la altura y anchura de la pantalla
 
     return SliverAppBar(
       actions: [
         IconButton(
-          onPressed: ()async{
+          onPressed: () async {
             // ref.read(localStorageRepositoryProvider)
             // .toggleFavorite(movie)
             // .then((_){
             //   ref.invalidate(isFavoriteProvider(movie.id)); // invalidamos el provider para que se actualice
             // });
-            await ref.read(favoriteMoviesProvider.notifier).toggleFavorite(movie);
-            ref.invalidate(isFavoriteProvider(movie.id)); // invalidamos el provider para que se actualice
+            await ref
+                .read(favoriteMoviesProvider.notifier)
+                .toggleFavorite(movie);
+            ref.invalidate(
+              isFavoriteProvider(movie.id),
+            ); // invalidamos el provider para que se actualice
           },
           icon: isFavFuture.when(
             loading: () => const CircularProgressIndicator(),
-            data: (isFav) => isFav ? Icon(Icons.favorite, color: Colors.red): Icon(Icons.favorite_border)  ,
-            error: (_,_) => throw UnimplementedError() // no implementamos nada en caso de error por pereza
-          ),  
-          
+            data: (isFav) => isFav
+                ? Icon(Icons.favorite, color: Colors.red)
+                : Icon(Icons.favorite_border),
+            error: (_, _) =>
+                throw UnimplementedError(), // no implementamos nada en caso de error por pereza
+          ),
+
           // Icon(Icons.favorite_border),
           // icon:  Icon(Icons.favorite, color: Colors.red),
-        )
+        ),
       ],
       backgroundColor: Colors.black,
       expandedHeight: size.height * 0.7, // ocupamos el 70% de la pantalla
@@ -103,25 +111,20 @@ class _CustomSliverAppBar extends ConsumerWidget {
       flexibleSpace: FlexibleSpaceBar(
         // titlePadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
         // title: Text(
-        //   movie.title, 
-        //   style: const TextStyle(color: Colors.white, fontSize: 20), 
-        //   textAlign: TextAlign.start, 
+        //   movie.title,
+        //   style: const TextStyle(color: Colors.white, fontSize: 20),
+        //   textAlign: TextAlign.start,
         //   maxLines: 2,
         // ),
         background: Stack(
-          children:[
+          children: [
             SizedBox.expand(
-              child: Image.network(
-                movie.posterPath,
-                fit: BoxFit.cover,
-                width: size.width,
-                loadingBuilder: (context, child, loadingProgress){
-                  if(loadingProgress != null) return const SizedBox();
-
-                  return FadeIn(child: child);
-                },
+              child: FadeIn(
+                child: CustomCacheImageNetwork(
+                  imageUrl: movie.posterPath,
+                  width: size.width,
+                ),
               ),
-
             ),
 
             const _CustomGradient(
@@ -134,10 +137,12 @@ class _CustomSliverAppBar extends ConsumerWidget {
               colors: [Colors.transparent, Colors.black87],
               begin: Alignment.bottomCenter,
               end: Alignment.topCenter,
-              stops: [0.80, 1.0], // dependiendo de la cantidad de colores, primer elemento para el primer color, etc   
-            )
-            
-          ] 
+              stops: [
+                0.80,
+                1.0,
+              ], // dependiendo de la cantidad de colores, primer elemento para el primer color, etc
+            ),
+          ],
         ),
       ),
     );
@@ -151,8 +156,9 @@ class _MovieDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
-    final size = MediaQuery.of(context).size; // obtenemos la altura y anchura de la pantalla
+    final size = MediaQuery.of(
+      context,
+    ).size; // obtenemos la altura y anchura de la pantalla
     final textStyle = Theme.of(context).textTheme;
     final colors = Theme.of(context).colorScheme;
 
@@ -167,28 +173,33 @@ class _MovieDetails extends StatelessWidget {
               // Imagen
               ClipRRect(
                 borderRadius: BorderRadius.circular(20),
-                child: Image.network(
-                  movie.posterPath,
+                child: CustomCacheImageNetwork(
+                  imageUrl: movie.posterPath,
                   width: size.width * 0.3,
+                  height: size.height * 0.225,
                 ),
               ),
 
               const SizedBox(width: 10),
 
-              // Información 
+              // Información
               SizedBox(
                 width: (size.width - 40) * 0.7,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(movie.title, style: textStyle.titleLarge, textAlign: TextAlign.left,),
+                    Text(
+                      movie.title,
+                      style: textStyle.titleLarge,
+                      textAlign: TextAlign.left,
+                    ),
                     SizedBox(height: 10),
-                    Text(movie.overview, ),
+                    Text(movie.overview),
                   ],
                 ),
               ),
             ],
-          )
+          ),
         ),
 
         // Generos
@@ -196,18 +207,23 @@ class _MovieDetails extends StatelessWidget {
           padding: const EdgeInsets.all(8),
           child: Wrap(
             children: [
-              ...movie.genreIds.map((gender) => Container(
-                margin: const EdgeInsets.only(right: 10),
-                child: Chip(
-                  label: Text(gender.toString(), style: TextStyle(color: Colors.white),),
-                  backgroundColor: colors.primary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
+              ...movie.genreIds.map(
+                (gender) => Container(
+                  margin: const EdgeInsets.only(right: 10),
+                  child: Chip(
+                    label: Text(
+                      gender.toString(),
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    backgroundColor: colors.primary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
                   ),
                 ),
-              )),
+              ),
             ],
-          )
+          ),
         ),
 
         // Actores
@@ -226,10 +242,9 @@ class _ActorsByMovie extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-
     final actorsByMovie = ref.watch(actorByMovieProvider);
 
-    if(actorsByMovie[movieId] == null){
+    if (actorsByMovie[movieId] == null) {
       return Center(child: const CircularProgressIndicator());
     }
 
@@ -240,42 +255,42 @@ class _ActorsByMovie extends ConsumerWidget {
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: actors.length,
-        itemBuilder: (context, index){
+        itemBuilder: (context, index) {
           final actor = actors[index];
 
           return Container(
             padding: const EdgeInsets.all(8),
             width: 135,
             child: Column(
-               crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 FadeInRight(
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(20),
-                    child: Image.network(
-                      actor.profilePath,
+                    child: CustomCacheImageNetwork(
+                      imageUrl: actor.profilePath,
                       width: 135,
                       height: 180,
-                      fit: BoxFit.cover,
                     ),
                   ),
                 ),
                 const SizedBox(height: 10),
-                Text(actor.name, style: Theme.of(context).textTheme.titleMedium,),
-                 Text(
-                  actor.character ?? '',
-                  maxLines: 2, 
-                  style: TextStyle(fontWeight: FontWeight.bold, overflow: TextOverflow.ellipsis),
+                Text(
+                  actor.name,
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
-               
+                Text(
+                  actor.character ?? '',
+                  maxLines: 2,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
               ],
-
-            )    
-            
+            ),
           );
-
         },
-
       ),
     );
   }
@@ -288,10 +303,10 @@ class _CustomGradient extends StatelessWidget {
   final List<Color> colors;
 
   const _CustomGradient({
-    required this.begin, 
-    required this.end, 
-    required this.stops, 
-    required this.colors
+    required this.begin,
+    required this.end,
+    required this.stops,
+    required this.colors,
   });
 
   @override
@@ -302,11 +317,12 @@ class _CustomGradient extends StatelessWidget {
           gradient: LinearGradient(
             colors: colors,
             begin: begin,
-            end:end,
-            stops: stops, // dependiendo de la cantidad de colores, primer elemento para el primer color, etc
-          )
+            end: end,
+            stops:
+                stops, // dependiendo de la cantidad de colores, primer elemento para el primer color, etc
+          ),
         ),
-      )
+      ),
     );
   }
 }
